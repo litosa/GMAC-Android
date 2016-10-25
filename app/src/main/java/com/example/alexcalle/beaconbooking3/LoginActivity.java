@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 public class LoginActivity extends Activity implements AuthGetListener {
 
+    //Test GitHub
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
