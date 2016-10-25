@@ -10,7 +10,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="50dp"
     android:background="#000000"
-    tools:context="com.example.alexcalle.beaconbooking3.EstimoteActivity">
+    tools:context="com.example.alexcalle.beaconbooking3.RegionActivity">
 
 
     <LinearLayout

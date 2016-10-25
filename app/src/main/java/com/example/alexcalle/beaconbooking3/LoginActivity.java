@@ -1,103 +1,70 @@
 package com.example.alexcalle.beaconbooking3;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.Handler;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.view.WindowManager;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.util.Log;
 import android.widget.Toast;
 
-public class LoginActivity extends Activity implements AuthGetListener {
+import com.auth0.android.Auth0;
+import com.auth0.android.authentication.AuthenticationAPIClient;
+import com.auth0.android.authentication.AuthenticationException;
+import com.auth0.android.callback.BaseCallback;
+import com.auth0.android.lock.AuthenticationCallback;
+import com.auth0.android.lock.Lock;
+import com.auth0.android.lock.LockCallback;
+import com.auth0.android.lock.utils.LockException;
+import com.auth0.android.result.Credentials;
+import com.auth0.android.result.UserProfile;
+import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
 
-    //Test GitHub
+import java.util.HashMap;
+import java.util.Map;
+
+
+public class LoginActivity extends Activity {
+
+    private Lock lock;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        setContentView(R.layout.loginactivity);
-
-
-        final EditText etUsername = (EditText) findViewById(R.id.etUsernameLogin);
-        etUsername.setTextColor(Color.rgb(255, 255, 255));
-
-        final EditText etPassword = (EditText) findViewById(R.id.etPasswordLogin);
-        etPassword.setTextColor(Color.rgb(255, 255, 255));
-
-        final Button bLogin = (Button) findViewById(R.id.bLogin);
-        final TextView registerLink = (TextView) findViewById(R.id.link_to_register);
+        Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
+        lock = Lock.newBuilder(auth0, callback)
+                // Add parameters to the Lock Builder
+                .build(this);
 
 
-        bLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                final String username = etUsername.getText().toString();
-                final String password = etPassword.getText().toString();
-
-                AuthService service = new AuthService();
-
-                service.login(username, password, LoginActivity.this);
-
-            }
-        });
-
-        registerLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent registerIntent = new Intent(LoginActivity.this, RegisterActivity.class);
-                startActivity(registerIntent);
-            }
-        });
-
+        startActivity(lock.newIntent(this));
     }
+
 
     @Override
-    public void onAuthGetSuccess(String token, int expiresIn, String userName) {
-
-        Context context = getApplicationContext();
-        CharSequence text = "Välkommen " + userName + " Du har loggat in!";
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-
-        String _token = token;
-        int _expiresIn = expiresIn;
-        String _userName = userName;
-
-        Intent estimoteIntent = new Intent(LoginActivity.this, EstimoteActivity.class);
-        Bundle extras = new Bundle();
-        extras.putString("userName", _userName);
-        extras.putString("token", _token);
-        extras.putInt("expiresIn", _expiresIn);
-
-        estimoteIntent.putExtras(extras);
-
-        startActivity(estimoteIntent);
+    protected void onDestroy() {
+        super.onDestroy();
+        // Your own Activity code
+        lock.onDestroy(this);
+        lock = null;
     }
 
-    @Override
-    public void onAuthGetFailure() {
+    private final LockCallback callback = new AuthenticationCallback() {
+        @Override
+        public void onAuthentication(Credentials credentials) {
+            // Login Success response
+            Toast.makeText(getApplicationContext(), "Välkommen!", Toast.LENGTH_SHORT).show();
+            CredentialsManager.saveCredentials(getApplicationContext(), credentials);
+            startActivity(new Intent(LoginActivity.this, RegionActivity.class));
+            finish();
+        }
 
-        Context context = getApplicationContext();
-        CharSequence text = "Felaktigt användarnamn eller lösenord!";
-        int duration = Toast.LENGTH_LONG;
+        @Override
+        public void onCanceled() {
 
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+        }
 
-        Intent loginIntent = new Intent(LoginActivity.this, LoginActivity.class);
-        startActivity(loginIntent);
-    }
+        @Override
+        public void onError(LockException error) {
+
+        }
+    };
 }

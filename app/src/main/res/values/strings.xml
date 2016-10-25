@@ -1,3 +1,18 @@
 <resources>
     <string name="app_name">BeaconBook</string>
+
+    <string name="auth0_preferences">AUTH0_SHARED_PREFERENCES_KEY</string>
+    <string name="refresh">Get New ID With a RefreshTokenID</string>
+    <string name="token">Get New ID With a TokenID</string>
+    <string name="logout">Logout</string>
+
+    <string name="welcome_message">Welcome To BeaconBook</string>
+    <string name="auth0_client_id">xTgBLq0TU9tjnXLA3rWHlrJaCm10n0xD</string>
+    <string name="auth0_domain">alcagroup.eu.auth0.com</string>
+
+    <string name="please_login">Please Login with your email and password</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login_success">Login was successful</string>
+    <string name="login">Login</string>
 </resources>

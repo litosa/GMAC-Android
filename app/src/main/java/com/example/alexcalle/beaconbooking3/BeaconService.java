@@ -17,10 +17,10 @@ public class BeaconService implements RestClientListener {
     private BeaconGetListener _getListener;
 
 
-    public void getBeaconInfo(String userName, int minorId, int majorId, String token, BeaconGetListener getListener) {
+    public void getBeaconInfo(int minorId, int majorId, BeaconGetListener getListener) {
         this._getListener = getListener;
 
-        BeaconViewModel bvm = new BeaconViewModel(userName, minorId, majorId);
+        BeaconViewModel bvm = new BeaconViewModel(minorId, majorId);
         Gson gson = new Gson();
         String bvmJson = gson.toJson(bvm);
 
@@ -30,7 +30,7 @@ public class BeaconService implements RestClientListener {
         headers.put("Content-Type", "application/json; charset=utf-8");
         headers.put("Accept", "application/json; charset=utf-8");
 //        headers.put("Authentication", "bearer " + token);
-        headers.put("Authorization", "bearer " + token);
+        headers.put("Authorization", "bearer ");
 
         RestClient restClient = new RestClient(url, method, headers, bvmJson, this);
         restClient.execute();

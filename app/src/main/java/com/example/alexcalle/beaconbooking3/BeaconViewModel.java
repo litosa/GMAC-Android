@@ -10,9 +10,8 @@ public class BeaconViewModel
     int minorId;
     int majorId;
 
-    public BeaconViewModel(String userName, int minorId, int majorId)
+    public BeaconViewModel(int minorId, int majorId)
     {
-        this.userName = userName;
         this.minorId = minorId;
         this.majorId = majorId;
     }

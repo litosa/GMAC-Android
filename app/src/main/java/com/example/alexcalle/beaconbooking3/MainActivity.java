@@ -1,104 +1,111 @@
 package com.example.alexcalle.beaconbooking3;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.WindowManager;
+import android.support.v7.app.AppCompatActivity;
 
-import com.estimote.sdk.Beacon;
-import com.estimote.sdk.BeaconManager;
-import com.estimote.sdk.Region;
-import com.estimote.sdk.SystemRequirementsChecker;
+import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import com.auth0.android.Auth0;
+import com.auth0.android.authentication.AuthenticationAPIClient;
+import com.auth0.android.authentication.AuthenticationException;
+import com.auth0.android.callback.BaseCallback;
+import com.auth0.android.result.Delegation;
+import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
+//
+//import com.auth0.logindemo.R;
 
-//Denna klass används knappt om ens något alls
 
 public class MainActivity extends AppCompatActivity {
 
-    private BeaconManager beaconManager;
-    private Region region;
+    private AuthenticationAPIClient mAuthenticationClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.mainactivity);
 
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        mAuthenticationClient = new AuthenticationAPIClient(new Auth0(getString(R.string.auth0_client_id), getString(R.string.auth0_domain)));
 
-        setContentView(R.layout.activity_main);
+        Button refreshTokenButton = (Button) findViewById(R.id.refreshTokenButton);
+        Button idTokenButton = (Button) findViewById(R.id.tokenIDButton);
+        Button logoutButton = (Button) findViewById(R.id.logout);
 
-        beaconManager = new BeaconManager(this);
-
-        beaconManager.setRangingListener(new BeaconManager.RangingListener(){
+        refreshTokenButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
-                if (!list.isEmpty()) {
-                    Beacon nearestBeacon = list.get(0);
-                    List<String> places = placesNearBeacon(nearestBeacon);
-                    // TODO: update the UI here
-                    Log.d("Sigma", "Nearest places: " + places);
-                }
+            public void onClick(View v) {
+                getNewIDWithRefreshToken();
             }
         });
-
-        region = new Region("ranged region",
-                UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, null);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        SystemRequirementsChecker.checkWithDefaultDialogs(this);
-
-        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+        idTokenButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onServiceReady() {
-                beaconManager.startRanging(region);
+            public void onClick(View v) {
+                getNewIDWithOldIDToken();
+            }
+        });
+        logoutButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                logout();
             }
         });
     }
 
-    @Override
-    protected void onPause() {
-        beaconManager.stopRanging(region);
+    private void getNewIDWithOldIDToken() {
+        String idToken = CredentialsManager.getCredentials(this).getIdToken();
+        mAuthenticationClient.delegationWithIdToken(idToken).start(new BaseCallback<Delegation, AuthenticationException>() {
+            @Override
+            public void onSuccess(final Delegation payload) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "New idToken: " + payload.getIdToken(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
-        super.onPause();
+            @Override
+            public void onFailure(AuthenticationException error) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "Failed to get the new idToken", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
     }
 
-    private static final Map<String, List<String>> PLACES_BY_BEACONS;
+    private void getNewIDWithRefreshToken() {
+        String refreshToken = CredentialsManager.getCredentials(this).getRefreshToken();
+        mAuthenticationClient.delegationWithRefreshToken(refreshToken).start(new BaseCallback<Delegation, AuthenticationException>() {
+            @Override
+            public void onSuccess(final Delegation payload) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "New idToken: " + payload.getIdToken(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
 
-    // TODO: replace "<major>:<minor>" strings to match your own beacons.
-    static {
-        Map<String, List<String>> placesByBeacons = new HashMap<>();
-        placesByBeacons.put("37493:63995", new ArrayList<String>() {{
-            add("Utvecklare");
-            // read as: "Utvecklare" is closest
-            // to the beacon with major 37493 and minor 63995
-            add("Designer");
-            // "Designer" is the next closest
-            add("My Team");
-            // "My Team" is the furthest away
-        }});
-        placesByBeacons.put("648:12", new ArrayList<String>() {{
-            add("My Team");
-            add("Designer");
-            add("Utvecklare");
-        }});
-        PLACES_BY_BEACONS = Collections.unmodifiableMap(placesByBeacons);
+            @Override
+            public void onFailure(AuthenticationException error) {
+                MainActivity.this.runOnUiThread(new Runnable() {
+                    public void run() {
+                        Toast.makeText(MainActivity.this, "Failed to get the new idToken", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
     }
 
-    private List<String> placesNearBeacon(Beacon beacon) {
-        String beaconKey = String.format("%d:%d", beacon.getMajor(), beacon.getMinor());
-        if (PLACES_BY_BEACONS.containsKey(beaconKey)) {
-            return PLACES_BY_BEACONS.get(beaconKey);
-        }
-        return Collections.emptyList();
+
+    private void logout() {
+        CredentialsManager.deleteCredentials(this);
+        startActivity(new Intent(this, LoginActivity.class));
+        finish();
     }
 }

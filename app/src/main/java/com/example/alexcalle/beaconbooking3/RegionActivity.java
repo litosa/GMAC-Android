@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.estimote.sdk.Beacon;
@@ -20,11 +19,11 @@ import com.estimote.sdk.Region;
 import java.util.List;
 import java.util.UUID;
 
-public class EstimoteActivity extends Activity implements BeaconGetListener {
+public class RegionActivity extends Activity implements BeaconGetListener {
 
 
     private BeaconManager beaconManager;
-    private static final String TAG = "EstimoteActivity";
+    private static final String TAG = "RegionActivity";
     private String _userName;
     private String _token;
     private int _expiresIn;
@@ -36,7 +35,7 @@ public class EstimoteActivity extends Activity implements BeaconGetListener {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(R.layout.estimoteactivity);
+        setContentView(R.layout.regionactivity);
 
         // Load the ImageView that will host the animation and
         // set its background to our AnimationDrawable XML resource.
@@ -50,33 +49,12 @@ public class EstimoteActivity extends Activity implements BeaconGetListener {
         frameAnimation.start();
 
 
-//        final ImageView img = (ImageView)findViewById(R.id.imageAnimation);
-//        img.setBackgroundResource(R.drawable.animation_list);
-//        img.post(new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                AnimationDrawable frameAnimation = (AnimationDrawable) img.getBackground();
-//
-//                                frameAnimation.start();
-//                            }
-//                        });
-
-
-
-        //Get Authenticated User//
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        _userName = extras.getString("userName");
-        _token = extras.getString("token");
-        _expiresIn = extras.getInt("expiresIn");
-
-
         Button bLogOut = (Button) findViewById(R.id.bLogOut);
 
         bLogOut.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intentLogout = new Intent(EstimoteActivity.this, LoginActivity.class);
+                Intent intentLogout = new Intent(RegionActivity.this, LoginActivity.class);
                 startActivity(intentLogout);
 
                 Context context = getApplicationContext();
@@ -100,7 +78,7 @@ public class EstimoteActivity extends Activity implements BeaconGetListener {
 
                 BeaconService service = new BeaconService();
 
-                service.getBeaconInfo(_userName, minorId, majorId, _token, EstimoteActivity.this);
+                service.getBeaconInfo(minorId, majorId, RegionActivity.this);
 
             }
 
@@ -145,7 +123,7 @@ public class EstimoteActivity extends Activity implements BeaconGetListener {
     public void onBeaconGetSuccess(String room, String zone, BeaconType beaconType, boolean hasActiveBooking) {
         UserLocationService service = new UserLocationService();
 
-        service.updateUserLocation(_userName, room, zone, _token);
+        service.updateUserLocation(room, zone);
 
         Context context = getApplicationContext();
         CharSequence text = "Du har kommit till " + room + ", zon " + zone;

@@ -11,10 +11,10 @@ import java.util.HashMap;
  */
 
 public class UserLocationService {
-    public void updateUserLocation(String userName, String room, String zone, String token)
+    public void updateUserLocation(String room, String zone)
     {
 
-        UserLocationViewModel ulvm = new UserLocationViewModel(userName, room, zone);
+        UserLocationViewModel ulvm = new UserLocationViewModel(room, zone);
         Gson gson = new Gson();
         String ulvmJson = gson.toJson(ulvm);
 
@@ -22,7 +22,7 @@ public class UserLocationService {
         String method = "PUT";
         HashMap<String, String> headers = new HashMap<String, String>();
         headers.put("Content-Type", "application/json; charset=utf-8");
-        headers.put("Authorization", "bearer " + token);
+        headers.put("Authorization", "bearer ");
 
         RestClient restClient = new RestClient(url, method, headers, ulvmJson, null);
         restClient.execute();

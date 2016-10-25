@@ -10,9 +10,8 @@ public class UserLocationViewModel {
     String room;
     String zone;
 
-    public UserLocationViewModel(String userName, String room, String zone)
+    public UserLocationViewModel(String room, String zone)
     {
-        this.userName = userName;
         this.room = room;
         this.zone = zone;
     }
