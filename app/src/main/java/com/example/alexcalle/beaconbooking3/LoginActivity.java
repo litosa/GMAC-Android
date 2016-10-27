@@ -29,13 +29,49 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
+//        lock = Lock.newBuilder(auth0, callback)
+////                 Add parameters to the Lock Builder
+//                .build(this);
+//        startActivity(lock.newIntent(this));
+
+
+//        AuthenticationAPIClient aClient = new AuthenticationAPIClient(auth0);
+//        aClient.tokenInfo(CredentialsManager.getCredentials(this).getIdToken())
+//                .start(new BaseCallback<UserProfile, AuthenticationException>() {
+//                    @Override
+//                    public void onSuccess(final UserProfile payload) {
+//                        LoginActivity.this.runOnUiThread(new Runnable() {
+//                            public void run() {
+//                                payload.getId();
+////                                Toast.makeText(LoginActivity.this, "Automatic Login Success", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                        startActivity(new Intent(getApplicationContext(), RegionActivity.class));
+//                        finish();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(AuthenticationException error) {
+//                        LoginActivity.this.runOnUiThread(new Runnable() {
+//                            public void run() {
+//                                Toast.makeText(LoginActivity.this, "Session Expired, please Log In", Toast.LENGTH_SHORT).show();
+//                            }
+//                        });
+//                        CredentialsManager.deleteCredentials(getApplicationContext());
+//                        startActivity(lock.newIntent(LoginActivity.this));
+//                    }
+//                });
+
+
         Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
         lock = Lock.newBuilder(auth0, callback)
-                // Add parameters to the Lock Builder
+//                 Add parameters to the Lock Builder
                 .build(this);
-
-
         startActivity(lock.newIntent(this));
+
+
+
     }
 
 
@@ -59,12 +95,12 @@ public class LoginActivity extends Activity {
 
         @Override
         public void onCanceled() {
-
+            Toast.makeText(getApplicationContext(), "Log In - Cancelled", Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onError(LockException error) {
-
+            Toast.makeText(getApplicationContext(), "Log In - Error Occurred", Toast.LENGTH_SHORT).show();
         }
     };
 }

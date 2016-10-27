@@ -12,21 +12,25 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.auth0.android.Auth0;
+import com.auth0.android.authentication.AuthenticationAPIClient;
+import com.auth0.android.authentication.AuthenticationException;
+import com.auth0.android.callback.BaseCallback;
+import com.auth0.android.result.UserProfile;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
+import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
 
 import java.util.List;
 import java.util.UUID;
 
-public class RegionActivity extends Activity implements BeaconGetListener {
+public class RegionActivity extends Activity implements ZoneGetListener {
 
 
     private BeaconManager beaconManager;
     private static final String TAG = "RegionActivity";
     private String _userName;
-    private String _token;
-    private int _expiresIn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,9 +80,9 @@ public class RegionActivity extends Activity implements BeaconGetListener {
                 int minorId = beacon.getMinor();
                 int majorId = beacon.getMajor();
 
-                BeaconService service = new BeaconService();
+                ZoneService service = new ZoneService();
 
-                service.getBeaconInfo(minorId, majorId, RegionActivity.this);
+                service.getZoneInfo(majorId, RegionActivity.this);
 
             }
 
@@ -103,39 +107,50 @@ public class RegionActivity extends Activity implements BeaconGetListener {
                         "monitored region",
                         UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
                         null, null));
-
-//                beaconManager.startMonitoring(new Region(
-//                        "monitored region",
-//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-//                        37493, 63995));
-
-
-                //beaconManager.startMonitoring(new Region(
-                        //"monitored region",
-                        //UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-                        //51863, 32449));
             }
         });
     }
 
 
     @Override
-    public void onBeaconGetSuccess(String room, String zone, BeaconType beaconType, boolean hasActiveBooking) {
-        UserLocationService service = new UserLocationService();
+    public void onZoneGetSuccess(final String zoneName) {
 
-        service.updateUserLocation(room, zone);
+        Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
+        AuthenticationAPIClient client = new AuthenticationAPIClient(auth0);
 
-        Context context = getApplicationContext();
-        CharSequence text = "Du har kommit till " + room + ", zon " + zone;
-        int duration = Toast.LENGTH_LONG;
+        client.tokenInfo(CredentialsManager.getCredentials(this).getIdToken())
+                .start(new BaseCallback<UserProfile, AuthenticationException>() {
+                    @Override
+                    public void onSuccess(final UserProfile payload){
 
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
+                        RegionActivity.this.runOnUiThread(new Runnable() {
+                            public void run() {
+                                EmployeeService service = new EmployeeService();
+
+                                service.updateUserLocation(zoneName, payload.getId());
+
+                                Context context = getApplicationContext();
+                                CharSequence text = "Du har kommit till zon " + zoneName;
+                                int duration = Toast.LENGTH_LONG;
+
+                                Toast toast = Toast.makeText(context, text, duration);
+                                toast.show();
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onFailure(AuthenticationException error){
+
+                    }
+                });
+
+
 
     }
 
     @Override
-    public void onBeaconGetFailure() {
+    public void onZoneGetFailure() {
 
         Context context = getApplicationContext();
         CharSequence text = "Det går inte att lokalisera dig!";
