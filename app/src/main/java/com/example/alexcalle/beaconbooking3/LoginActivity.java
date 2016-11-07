@@ -29,13 +29,6 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-//        Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
-//        lock = Lock.newBuilder(auth0, callback)
-////                 Add parameters to the Lock Builder
-//                .build(this);
-//        startActivity(lock.newIntent(this));
-
-
 //        AuthenticationAPIClient aClient = new AuthenticationAPIClient(auth0);
 //        aClient.tokenInfo(CredentialsManager.getCredentials(this).getIdToken())
 //                .start(new BaseCallback<UserProfile, AuthenticationException>() {
@@ -66,14 +59,10 @@ public class LoginActivity extends Activity {
 
         Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
         lock = Lock.newBuilder(auth0, callback)
-//                 Add parameters to the Lock Builder
                 .build(this);
+
         startActivity(lock.newIntent(this));
-
-
-
     }
-
 
     @Override
     protected void onDestroy() {
