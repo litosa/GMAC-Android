@@ -29,10 +29,7 @@
         <activity
             android:name=".RegionActivity"
             android:allowBackup="true" />
-        <activity android:name=".RangingActivity" />
-        <activity
-            android:name=".StartActivity"
-            android:noHistory="true">
+        <activity android:name=".StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -41,6 +38,7 @@
         </activity>
         <activity android:name=".LoginActivity" />
         <activity android:name=".MainActivity" />
+        <activity android:name=".SendEmailActivity" />
 
         <!-- Auth0 Lock -->
         <activity

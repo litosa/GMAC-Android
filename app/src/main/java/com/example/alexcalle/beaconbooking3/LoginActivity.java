@@ -14,6 +14,7 @@ import com.auth0.android.lock.AuthenticationCallback;
 import com.auth0.android.lock.Lock;
 import com.auth0.android.lock.LockCallback;
 import com.auth0.android.lock.utils.LockException;
+import com.auth0.android.management.UsersAPIClient;
 import com.auth0.android.result.Credentials;
 import com.auth0.android.result.UserProfile;
 import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
@@ -29,6 +30,8 @@ public class LoginActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+//        Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
+//
 //        AuthenticationAPIClient aClient = new AuthenticationAPIClient(auth0);
 //        aClient.tokenInfo(CredentialsManager.getCredentials(this).getIdToken())
 //                .start(new BaseCallback<UserProfile, AuthenticationException>() {
@@ -37,7 +40,7 @@ public class LoginActivity extends Activity {
 //                        LoginActivity.this.runOnUiThread(new Runnable() {
 //                            public void run() {
 //                                payload.getId();
-////                                Toast.makeText(LoginActivity.this, "Automatic Login Success", Toast.LENGTH_SHORT).show();
+//                                Toast.makeText(LoginActivity.this, "Automatic Login Success", Toast.LENGTH_SHORT).show();
 //                            }
 //                        });
 //                        startActivity(new Intent(getApplicationContext(), RegionActivity.class));
@@ -58,11 +61,14 @@ public class LoginActivity extends Activity {
 
 
         Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
+        _auth0 = auth0;
         lock = Lock.newBuilder(auth0, callback)
                 .build(this);
 
         startActivity(lock.newIntent(this));
     }
+
+    Auth0 _auth0;
 
     @Override
     protected void onDestroy() {
@@ -76,6 +82,21 @@ public class LoginActivity extends Activity {
         @Override
         public void onAuthentication(Credentials credentials) {
             // Login Success response
+            AuthenticationAPIClient client = new AuthenticationAPIClient(_auth0);
+            client.tokenInfo(credentials.getIdToken())
+                    .start(new BaseCallback<UserProfile, AuthenticationException>() {
+                        @Override
+                        public void onSuccess(final UserProfile payload) {
+                            CredentialsManager.saveUserId(LoginActivity.this, payload.getId());
+                        }
+
+                        @Override
+                        public void onFailure(AuthenticationException error) {
+
+
+                        }
+                    });
+
             Toast.makeText(getApplicationContext(), "Välkommen!", Toast.LENGTH_SHORT).show();
             CredentialsManager.saveCredentials(getApplicationContext(), credentials);
             startActivity(new Intent(LoginActivity.this, RegionActivity.class));
