@@ -118,9 +118,8 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
                     }
 
 //                    Log.d(TAG, "MinorId: " + list.get(i).getMinor() + " || Power: " + list.get(i).getMeasuredPower() + " || Rssi: " + list.get(i).getRssi() + " || Mac: " + list.get(i).getMacAddress());
-//                    Beacon beacon = list.get(0);
-//                    Log.d(TAG, "MinorId: " + beacon.getMinor() + " || Power: " + beacon.getMeasuredPower() + " || Rssi: " + beacon.getRssi() + " || Mac: " + beacon.getMacAddress());
-//
+                    Log.d(TAG, "MinorId: " + list.get(0).getMinor() + " || Power: " + list.get(0).getMeasuredPower() + " || Rssi: " + list.get(0).getRssi() + " || Mac: " + list.get(0).getMacAddress());
+
 //                    int minorId = beacon.getMinor();
                 }
                 if (list.size() > 0){
