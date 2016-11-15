@@ -29,7 +29,7 @@ dependencies {
     compile 'com.auth0.android:lock:2.0.0'
     compile 'com.auth0.android:auth0:1.0.0'
     compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.estimote:sdk:0.11.1@aar'
+    compile 'com.estimote:sdk:0.13.0@aar'
     testCompile 'junit:junit:4.12'
     compile 'com.google.code.gson:gson:2.3'
     compile 'com.android.support:design:24.0.0'

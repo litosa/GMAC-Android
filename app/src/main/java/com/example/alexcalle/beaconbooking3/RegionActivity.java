@@ -27,19 +27,23 @@ import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.Region;
 import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
 
+import java.sql.Time;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-public class RegionActivity extends AppCompatActivity implements BeaconGetListener, EmployeeGetListener, FragmentEmployee.OnFragmentInteractionListener {
+public class RegionActivity extends AppCompatActivity implements BeaconGetListener {
 
 
     private BeaconManager beaconManager;
     private static final String TAG = "RegionActivity";
-    private String _userName;
-//    private GmacBeacon[] _beacons;
-    List<GmacBeacon> _beacons;
-    private String _employeeId;
+    private GmacBeacon[] _beacons;
+    private GmacBeacon _latestBeacon;
+    private Region[] _regions;
+    private LastBeacon _lastBeacon;
+    private EmployeeService _employeeService;
+
 
     @Override
     protected void onDestroy() {
@@ -81,206 +85,18 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
                 startActivity(intentLogout);
 
                 CharSequence text = "Du har loggat ut, Ha en fortsatt trevlig dag!";
-                int duration = Toast.LENGTH_LONG;
-
-                Toast toast = Toast.makeText(getApplicationContext(), text, duration);
-                toast.show();
+                showText(text);
                 finish();
             }
         });
 
-        final EmployeeService employeeService = new EmployeeService();
-        employeeService.getEmployees(RegionActivity.this);
-
-        BeaconService beaconService = new BeaconService();
-        beaconService.getAllBeacons(RegionActivity.this);
-
+        _lastBeacon = new LastBeacon();
+        _employeeService = new EmployeeService();
 
         beaconManager = new BeaconManager(getApplicationContext());
 
-        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
-            @Override
-            public void onBeaconsDiscovered(Region region, List<Beacon> list) {
-
-                Coords coordinates = new Coords();
-
-                for (int i = 0; i < list.size(); i++) {
-
-                    GmacBeacon beacon = getGmacBeacon(list.get(i).getMinor());
-
-                    if (beacon != null) {
-                        Coords coordsBasedOnRssi = getCoordsBasedOnRssi(beacon.coordinates, list.get(i).getRssi());
-                        coordinates.latitude += coordsBasedOnRssi.latitude;
-                        coordinates.longitude += coordsBasedOnRssi.longitude;
-                    }
-                    else {
-                        Log.d(TAG, "MinorId: " + list.get(i).getMinor());
-                    }
-
-//                    Log.d(TAG, "MinorId: " + list.get(i).getMinor() + " || Power: " + list.get(i).getMeasuredPower() + " || Rssi: " + list.get(i).getRssi() + " || Mac: " + list.get(i).getMacAddress());
-                    Log.d(TAG, "MinorId: " + list.get(0).getMinor() + " || Power: " + list.get(0).getMeasuredPower() + " || Rssi: " + list.get(0).getRssi() + " || Mac: " + list.get(0).getMacAddress());
-
-//                    int minorId = beacon.getMinor();
-                }
-                if (list.size() > 0){
-                    employeeService.updateUserLocation(coordinates, CredentialsManager.getUserId(RegionActivity.this));
-                }
-            }
-        });
-        beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
-            @Override
-            public void onEnteredRegion(Region region, List<Beacon> list) {
-
-
-                Log.d(TAG, "Antal Beacons: " + list.size());
-
-                Beacon beacon = list.get(0);
-                int minorId = beacon.getMinor();
-                int majorId = beacon.getMajor();
-
-//                ZoneService service = new ZoneService();
-//                service.getZoneInfo(majorId, RegionActivity.this);
-
-                BeaconService service = new BeaconService();
-                service.getAllBeacons(RegionActivity.this);
-
-            }
-
-
-            @Override
-            public void onExitedRegion(Region region) {
-                Context context = getApplicationContext();
-                CharSequence text = "Hej då!";
-                int duration = Toast.LENGTH_SHORT;
-
-                Toast toast = Toast.makeText(context, text, duration);
-                toast.show();
-            }
-        });
-
-
-//        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
-//            @Override
-//            public void onServiceReady() {
-////                Log.d(TAG, "startBeaconMonitoring called");
-////                beaconManager.startMonitoring(new Region(
-////                        "monitored region",
-////                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-////                        null, null));
-//                Log.d(TAG, "startRanging called");
-//                beaconManager.startRanging(new Region(
-//                        "monitored region",
-//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-//                        null, null));
-//
-//            }
-//        });
-    }
-
-//    @Override
-//    public void onZoneGetSuccess(final String zoneName) {
-//
-//        Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
-//        AuthenticationAPIClient client = new AuthenticationAPIClient(auth0);
-//
-//        client.tokenInfo(CredentialsManager.getCredentials(this).getIdToken())
-//                .start(new BaseCallback<UserProfile, AuthenticationException>() {
-//                    @Override
-//                    public void onSuccess(final UserProfile payload){
-//
-//                        RegionActivity.this.runOnUiThread(new Runnable() {
-//                            public void run() {
-//                                EmployeeService service = new EmployeeService();
-//
-//                                service.updateUserLocation(zoneName, payload.getId());
-//
-//                                Context context = getApplicationContext();
-//                                CharSequence text = "Du har kommit till zon " + zoneName;
-//                                int duration = Toast.LENGTH_LONG;
-//
-//                                Toast toast = Toast.makeText(context, text, duration);
-//                                toast.show();
-//                            }
-//                        });
-//                    }
-//
-//                    @Override
-//                    public void onFailure(AuthenticationException error){
-//
-//                    }
-//                });
-//
-//    }
-
-//    @Override
-//    public void onZoneGetFailure() {
-//
-//        Context context = getApplicationContext();
-//        CharSequence text = "Det går inte att lokalisera dig!";
-//        int duration = Toast.LENGTH_LONG;
-//
-//        Toast toast = Toast.makeText(context, text, duration);
-//        toast.show();
-//
-//    }
-
-    @Override
-    public void onFragmentInteraction(int position) {
-        Log.d("TAG", "MainActivity Log " + position + " selected");
-
-        startActivity(new Intent(RegionActivity.this, SendEmailActivity.class));
-
-    }
-
-//    @Override
-//    public void onBeaconGetSuccess(final Beacon[] beacons) {
-//
-//        if (beacons != null) {
-//            Auth0 auth0 = new Auth0("xTgBLq0TU9tjnXLA3rWHlrJaCm1OnOxD", "alcagroup.eu.auth0.com");
-//            AuthenticationAPIClient client = new AuthenticationAPIClient(auth0);
-//
-//            client.tokenInfo(CredentialsManager.getCredentials(this).getIdToken())
-//                    .start(new BaseCallback<UserProfile, AuthenticationException>() {
-//                        @Override
-//                        public void onSuccess(final UserProfile payload) {
-//
-//                            RegionActivity.this.runOnUiThread(new Runnable() {
-//                                public void run() {
-//                                    EmployeeService service = new EmployeeService();
-//
-//                                    service.updateUserLocation(beacon.coordinates, payload.getId());
-//
-//                                    Context context = getApplicationContext();
-//                                    CharSequence text = "Du har blivit träffad av " + beacon.name;
-//                                    int duration = Toast.LENGTH_LONG;
-//
-//                                    Toast toast = Toast.makeText(context, text, duration);
-//                                    toast.show();
-//                                }
-//                            });
-//                        }
-//
-//                        @Override
-//                        public void onFailure(AuthenticationException error) {
-//                            Context context = getApplicationContext();
-//                            CharSequence text = "Det går inte att lokalisera dig!";
-//                            int duration = Toast.LENGTH_LONG;
-//
-//                            Toast toast = Toast.makeText(context, text, duration);
-//                            toast.show();
-//
-//                        }
-//                    });
-//        }
-//    }
-
-
-    @Override
-    public void onBeaconGetSuccess(final GmacBeacon[] beacons) {
-
-//        _beacons = beacons;
-
-        _beacons = Arrays.asList(beacons);
+//        BeaconService beaconService = new BeaconService();
+//        beaconService.getAllBeacons(RegionActivity.this);
 
         beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
@@ -291,6 +107,82 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
                         null, null));
             }
         });
+
+        beaconManager.setForegroundScanPeriod(5000, 15000);
+
+        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+            @Override
+            public void onBeaconsDiscovered(Region region, List<Beacon> beacons) {
+
+                if (!beacons.isEmpty()) {
+
+                    _lastBeacon.lastDiscovery = new Date();
+                    int minorId = beacons.get(0).getMinor();
+
+                    if (_lastBeacon.minorId != minorId) {
+
+                        _lastBeacon.minorId = minorId;
+
+                        int currentZoneId = minorId;
+                        String employeeId = CredentialsManager.getUserId(getApplicationContext());
+
+                        CharSequence text = "Välkommen till " + minorId;
+                        showText(text);
+
+                        _employeeService.updateUserLocation(currentZoneId, employeeId);
+                    }
+                }
+            }
+
+
+//        beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
+//            @Override
+//            public void onEnteredRegion(Region region, List<Beacon> beacons) {
+//
+//                Log.i(TAG, "onEnteredRegion: " + region.getIdentifier());
+////                GmacBeacon beacon = getGmacBeacon(beacons.get(0).getMinor());
+//                CharSequence text = "Välkommen till " + region.getIdentifier();
+////                _latestBeacon = beacon;
+//                showText(text);
+//            }
+//
+//            @Override
+//            public void onExitedRegion(Region region) {
+//
+////                GmacBeacon beacon = getGmacBeacon(region.getMinor());
+//                Log.i(TAG, "onEnteredRegion: " + region.getIdentifier());
+//
+//                CharSequence text = "Du har gått ut från " + region.getIdentifier();
+////                CharSequence text = "Du har lämnat något";
+//                showText(text);
+//            }
+        });
+    }
+
+    @Override
+    public void onBeaconGetSuccess(final GmacBeacon[] beacons) {
+
+//        _beacons = beacons;
+//
+//        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+//            @Override
+//            public void onServiceReady() {
+//                beaconManager.startRanging(new Region(
+//                        "monitored region",
+//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
+//                        null, null));
+//
+//            }
+//        });
+
+//        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+//            @Override
+//            public void onServiceReady() {
+//                beaconManager.startMonitoring(new Region("A", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, 16901));
+//                beaconManager.startMonitoring(new Region("B", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, 11052));
+//
+//            }
+//        });
     }
 
     @Override
@@ -298,43 +190,27 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
 
     }
 
-    Employee[] _employees;
+//    public GmacBeacon getGmacBeacon(int minorId){
+//        for(int i = 0; i < _beacons.length; i++){
+//            if (_beacons[i]._id == minorId){
+//                return _beacons[i];
+//            }
+//        }
+//        return null;
+//    }
 
-    Employee[] get() {return _employees; }
-
-
-    @Override
-    public void onEmployeeGetSuccess(Employee[] employees) {
-        this._employees = employees;
-    }
-
-    @Override
-    public void onEmployeeGetFailure() {
-
-    }
-
-
-    public Coords getCoordsBasedOnRssi(Coords coords, int rssi) {
-
-        Coords coordsBasedOnRssi = new Coords();
-
-        double loss = (double)-rssi / 100;
-
-        double lat = coords.latitude - coords.latitude * loss;
-        double lon = coords.longitude - coords.longitude * loss;
-
-        coordsBasedOnRssi.latitude = (int)lat;
-        coordsBasedOnRssi.longitude = (int)lon;
-
-        return coordsBasedOnRssi;
-    }
-
-    public GmacBeacon getGmacBeacon(int minorId){
-        for(int i = 0; i < _beacons.size(); i++){
-            if (_beacons.get(i)._id == minorId){
-                return _beacons.get(i);
-            }
+    public void checkIfLeftTheBuilding() {
+        long diffInSeconds = (new Date().getTime() - _lastBeacon.lastDiscovery.getTime()) / 1000;
+        if (diffInSeconds > 30) {
+            CharSequence text = "Hej då!";
+            showText(text);
+            //Disconnecta kanske
         }
-        return null;
+    }
+
+    public void showText(CharSequence text) {
+        int duration = Toast.LENGTH_LONG;
+        Toast toast = Toast.makeText(getApplicationContext(), text, duration);
+        toast.show();
     }
 }

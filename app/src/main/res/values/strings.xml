@@ -17,15 +17,4 @@
     <string name="login_success">Login was successful</string>
     <string name="login">Login</string>
 
-    <string-array name="string_array_users">
-        <item>Litos</item>
-        <item>Alex</item>
-        <item>Calle</item>
-        <item>Rashwan</item>
-        <item>Linus</item>
-    </string-array>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-
 </resources>
