@@ -1,55 +1,44 @@
 package com.example.alexcalle.beaconbooking3;
 
-import android.app.Activity;
-import android.app.FragmentManager;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.auth0.android.Auth0;
-import com.auth0.android.authentication.AuthenticationAPIClient;
-import com.auth0.android.authentication.AuthenticationException;
-import com.auth0.android.callback.BaseCallback;
-import com.auth0.android.result.UserProfile;
 import com.estimote.sdk.Beacon;
 import com.estimote.sdk.BeaconManager;
+import com.estimote.sdk.Nearable;
 import com.estimote.sdk.Region;
+import com.estimote.sdk.SystemRequirementsChecker;
+import com.example.alexcalle.beaconbooking3.estimote.NearableID;
+import com.example.alexcalle.beaconbooking3.estimote.Product;
+import com.example.alexcalle.beaconbooking3.estimote.ShowroomManager;
 import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
 
-import java.sql.Time;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
-public class RegionActivity extends AppCompatActivity implements BeaconGetListener {
+public class RegionActivity extends AppCompatActivity {
 
 
-    private BeaconManager beaconManager;
-    private static final String TAG = "RegionActivity";
-    private GmacBeacon[] _beacons;
-    private GmacBeacon _latestBeacon;
-    private Region[] _regions;
+    private BeaconManager _beaconManager;
     private LastBeacon _lastBeacon;
     private EmployeeService _employeeService;
+    private String _scanId;
+    private static final String TAG = "RegionActivity";
 
+    private ShowroomManager _showroomManager;
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        beaconManager.disconnect();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +49,11 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
 
         setContentView(R.layout.regionactivity);
 
-        // Load the ImageView that will host the animation and
-        // set its background to our AnimationDrawable XML resource.
         ImageView img = (ImageView)findViewById(R.id.imageAnimation);
         img.setBackgroundResource(R.drawable.animation_list);
 
-        // Get the background, which has been compiled to an AnimationDrawable object.
         AnimationDrawable frameAnimation = (AnimationDrawable) img.getBackground();
 
-        // Start the animation (looped playback by default).
         frameAnimation.start();
 
 
@@ -90,27 +75,63 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
             }
         });
 
-        _lastBeacon = new LastBeacon();
+        Map<NearableID, Product> products = new HashMap<>();
+        products.put(new NearableID("9b7397a1b739a8f2"), new Product("Utsikten",
+                "Stickers Cykel"));
+        products.put(new NearableID("5ce0ed58811d25e8"), new Product("Trossen",
+                "Stickers Väska"));
+        products.put(new NearableID("c7bb7319f45a7c1f"), new Product("Bojen",
+                "Stickers Bil"));
+        products.put(new NearableID("07dd2ab8d9dddd61"), new Product("Växthuset",
+                "Stickers Hund"));
+        products.put(new NearableID("07b221ff4d842506"), new Product("Mellanrummet",
+                "Stickers Dörr"));
+        products.put(new NearableID("4e15e398f3b7f872"), new Product("Mässen",
+                "Stickers Säng"));
+        products.put(new NearableID("05d32b684a2ba23b"), new Product("Insikten",
+                "Stickers Sko"));
+        products.put(new NearableID("ecc412a4f6b5e7ee"), new Product("Brandgula rummet",
+                "Stickers Kylskåp"));
+        products.put(new NearableID("447824748a361bc5"), new Product("Rutiga rummet",
+                "Stickers Ingen logga"));
+        products.put(new NearableID("3ef047f82ce6f732"), new Product("Digitala rummet",
+                "Stickers Stol"));
+
+        _showroomManager = new ShowroomManager(this, products);
+
+//        _showroomManager.setListener(new ShowroomManager.Listener(){
+//            @Override
+//            public void onProductPickup(Product product) {
+//                ((TextView) findViewById(R.id.titleLabel)).setText(product.getName());
+//                ((TextView) findViewById(R.id.descriptionLabel)).setText(product.getSummary());
+//                findViewById(R.id.descriptionLabel).setVisibility(View.VISIBLE);
+//            }
+//            @Override
+//            public void onProductPutdown(Product product) {
+//                ((TextView) findViewById(R.id.titleLabel)).setText("Pick up an object to learn more about it");
+//                findViewById(R.id.descriptionLabel).setVisibility(View.INVISIBLE);
+//            }
+//        });
+
+
+        _lastBeacon = new LastBeacon(new Date());
         _employeeService = new EmployeeService();
 
-        beaconManager = new BeaconManager(getApplicationContext());
+        _beaconManager = new BeaconManager(getApplicationContext());
 
-//        BeaconService beaconService = new BeaconService();
-//        beaconService.getAllBeacons(RegionActivity.this);
-
-        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
+        _beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
             @Override
             public void onServiceReady() {
-                beaconManager.startRanging(new Region(
+                _beaconManager.startRanging(new Region(
                         "monitored region",
                         UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
                         null, null));
             }
         });
 
-        beaconManager.setForegroundScanPeriod(5000, 15000);
+        _beaconManager.setForegroundScanPeriod(5000, 15000);
 
-        beaconManager.setRangingListener(new BeaconManager.RangingListener() {
+        _beaconManager.setRangingListener(new BeaconManager.RangingListener() {
             @Override
             public void onBeaconsDiscovered(Region region, List<Beacon> beacons) {
 
@@ -118,6 +139,8 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
 
                     _lastBeacon.lastDiscovery = new Date();
                     int minorId = beacons.get(0).getMinor();
+
+                    checkIfLeftTheBuilding();
 
                     if (_lastBeacon.minorId != minorId) {
 
@@ -129,83 +152,61 @@ public class RegionActivity extends AppCompatActivity implements BeaconGetListen
                         CharSequence text = "Välkommen till " + minorId;
                         showText(text);
 
-                        _employeeService.updateUserLocation(currentZoneId, employeeId);
+                        _employeeService.updateUserZone(currentZoneId, employeeId);
                     }
                 }
             }
-
-
-//        beaconManager.setMonitoringListener(new BeaconManager.MonitoringListener() {
-//            @Override
-//            public void onEnteredRegion(Region region, List<Beacon> beacons) {
-//
-//                Log.i(TAG, "onEnteredRegion: " + region.getIdentifier());
-////                GmacBeacon beacon = getGmacBeacon(beacons.get(0).getMinor());
-//                CharSequence text = "Välkommen till " + region.getIdentifier();
-////                _latestBeacon = beacon;
-//                showText(text);
-//            }
-//
-//            @Override
-//            public void onExitedRegion(Region region) {
-//
-////                GmacBeacon beacon = getGmacBeacon(region.getMinor());
-//                Log.i(TAG, "onEnteredRegion: " + region.getIdentifier());
-//
-//                CharSequence text = "Du har gått ut från " + region.getIdentifier();
-////                CharSequence text = "Du har lämnat något";
-//                showText(text);
-//            }
         });
     }
 
     @Override
-    public void onBeaconGetSuccess(final GmacBeacon[] beacons) {
+    protected void onResume() {
+        super.onResume();
 
-//        _beacons = beacons;
-//
-//        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
-//            @Override
-//            public void onServiceReady() {
-//                beaconManager.startRanging(new Region(
-//                        "monitored region",
-//                        UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"),
-//                        null, null));
-//
-//            }
-//        });
-
-//        beaconManager.connect(new BeaconManager.ServiceReadyCallback() {
-//            @Override
-//            public void onServiceReady() {
-//                beaconManager.startMonitoring(new Region("A", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, 16901));
-//                beaconManager.startMonitoring(new Region("B", UUID.fromString("B9407F30-F5F8-466E-AFF9-25556B57FE6D"), null, 11052));
-//
-//            }
-//        });
+        if (!SystemRequirementsChecker.checkWithDefaultDialogs(this)) {
+            Log.e(TAG, "Can't scan for beacons, some pre-conditions were not met");
+            Log.e(TAG, "Read more about what's required at: http://estimote.github.io/Android-SDK/JavaDocs/com/estimote/sdk/SystemRequirementsChecker.html");
+            Log.e(TAG, "If this is fixable, you should see a popup on the app's screen right now, asking to enable what's necessary");
+        } else {
+            Log.d(TAG, "Starting ShowroomManager updates");
+            _showroomManager.startUpdates();
+        }
     }
 
     @Override
-    public void onBeaconGetFailure() {
-
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG, "Stopping ShowroomManager updates");
+        _showroomManager.stopUpdates();
     }
 
-//    public GmacBeacon getGmacBeacon(int minorId){
-//        for(int i = 0; i < _beacons.length; i++){
-//            if (_beacons[i]._id == minorId){
-//                return _beacons[i];
-//            }
-//        }
-//        return null;
-//    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        _showroomManager.destroy();
+    }
+
 
     public void checkIfLeftTheBuilding() {
-        long diffInSeconds = (new Date().getTime() - _lastBeacon.lastDiscovery.getTime()) / 1000;
-        if (diffInSeconds > 30) {
-            CharSequence text = "Hej då!";
-            showText(text);
-            //Disconnecta kanske
-        }
+
+        new android.os.Handler().postDelayed(
+                new Runnable() {
+                    public void run() {
+                        CharSequence text2 = "Hej från pollen!";
+                        showText(text2);
+                        long diffInSeconds = (new Date().getTime() - _lastBeacon.lastDiscovery.getTime()) / 1000;
+                        if (diffInSeconds > 30) {
+                            CharSequence text = "Hej då!";
+                            showText(text);
+                        }
+                        if (diffInSeconds > 3600) {
+                            CharSequence text = "Du har gått hem!";
+                            showText(text);
+                            _beaconManager.disconnect();
+                        }
+                    }
+                },
+                40000);
     }
 
     public void showText(CharSequence text) {
