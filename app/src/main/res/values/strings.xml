@@ -2,7 +2,8 @@
     <string name="app_name">BeaconBook</string>
 
     <string name="auth0_preferences">AUTH0_SHARED_PREFERENCES_KEY</string>
-    <string name="auth0_userId">AUTH0_SHARED_USER_ID</string>
+    <string name="auth0_userProfile">"AUTH0_SHARED_USER_PROFILE"</string>
+
     <string name="refresh">Get New ID With a RefreshTokenID</string>
     <string name="token">Get New ID With a TokenID</string>
     <string name="logout">Logout</string>
@@ -16,5 +17,7 @@
     <string name="password">Password</string>
     <string name="login_success">Login was successful</string>
     <string name="login">Login</string>
+
+    <string name="hint_first_name">Department</string>
 
 </resources>

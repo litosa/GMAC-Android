@@ -9,38 +9,52 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="50dp"
-    android:background="#009CDE"
-    tools:context="com.example.alexcalle.beaconbooking3.RegionActivity">
+    android:background="#f5f5ff"
+    tools:context="com.example.alexcalle.beaconbooking3.RegionActivity"
+    android:weightSum="1">
 
+    <!--<LinearLayout-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="wrap_content">-->
+        <!--<ImageView-->
+            <!--android:id="@+id/imageAnimation"-->
+            <!--android:layout_marginTop="-30dp"-->
+            <!--android:layout_marginStart="70dp"-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"/>-->
+    <!--</LinearLayout>-->
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="246dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="50dp">
 
-
-        <ImageView
-            android:id="@+id/imageAnimation"
-            android:layout_marginTop="-30dp"
-            android:layout_marginStart="70dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"/>
-
+        <pl.droidsonroids.gif.GifImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/dancegif"
+            android:background="#f5f5ff"
+            android:id="@+id/gifImageView" />
     </LinearLayout>
 
+
+
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="50dp">
+        android:layout_height="match_parent"
+        android:weightSum="5"
+        >
 
         <Button
+            android:layout_marginStart="75dp"
             android:id="@+id/bLogOut"
-            android:text="Logga ut!"
+            android:text="Logga ut"
             android:textColor="#ffffff"
             android:background="@drawable/button"
-            android:fontFamily="casual"
-            android:layout_marginTop="50dp"
-            android:layout_width="match_parent"
-            android:layout_height="70dp" />
+            android:layout_marginTop="275dp"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_weight="3"/>
 
     </LinearLayout>
 
