@@ -1,4 +1,4 @@
-package com.example.alexcalle.beaconbooking3;
+package com.example.alexcalle.beaconbooking3.activities;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,6 +16,13 @@ import com.auth0.android.lock.LockCallback;
 import com.auth0.android.lock.utils.LockException;
 import com.auth0.android.result.Credentials;
 import com.auth0.android.result.UserProfile;
+import com.example.alexcalle.beaconbooking3.models.Employee;
+import com.example.alexcalle.beaconbooking3.models.ImageCollection;
+import com.example.alexcalle.beaconbooking3.services.ImageService;
+import com.example.alexcalle.beaconbooking3.listeners.EmployeeGetListener;
+import com.example.alexcalle.beaconbooking3.listeners.EmployeePostListener;
+import com.example.alexcalle.beaconbooking3.listeners.ImageGetListener;
+import com.example.alexcalle.beaconbooking3.services.EmployeeService;
 import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
 
 import java.util.Map;
@@ -35,15 +42,10 @@ public class LoginActivity extends Activity implements EmployeeGetListener, Empl
         Auth0 auth0 = new Auth0("BWJySS4YC58U9l0MnoqWIO2CIictpkG7", "alcagroup.eu.auth0.com");
         _auth0 = auth0;
 
-//        List<CustomField> customFields = new ArrayList<>();
-//        CustomField fieldName = new CustomField(R.drawable.ic_field_person, CustomField.FieldType.TYPE_NAME, "department", R.string.hint_first_name);
-//        customFields.add(fieldName);
-
         ParameterBuilder builder = ParameterBuilder.newBuilder();
         Map<String, Object> authenticationParameters = builder.setScope("openid offline_access").asDictionary();
         lock = Lock.newBuilder(auth0, callback)
                 .withAuthenticationParameters(authenticationParameters)
-//                .withSignUpFields(customFields)
                 .build(this);
         startActivity(lock.newIntent(this));
     }
@@ -78,10 +80,6 @@ public class LoginActivity extends Activity implements EmployeeGetListener, Empl
                         public void onFailure(AuthenticationException error) {
                         }
                     });
-
-//            Toast.makeText(getApplicationContext(), "Välkommen!", Toast.LENGTH_SHORT).show();
-//            CredentialsManager.saveCredentials(getApplicationContext(), credentials);
-//            startActivity(new Intent(LoginActivity.this, RegionActivity.class));
             finish();
         }
 
@@ -111,7 +109,6 @@ public class LoginActivity extends Activity implements EmployeeGetListener, Empl
 
     @Override
     public void onEmployeeGetFailure() {
-        startActivity(new Intent(LoginActivity.this, LoginActivity.class));
     }
 
     @Override
@@ -121,7 +118,6 @@ public class LoginActivity extends Activity implements EmployeeGetListener, Empl
 
     @Override
     public void onEmployeePostFailure() {
-
     }
 
     @Override

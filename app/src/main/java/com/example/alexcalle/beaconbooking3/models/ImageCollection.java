@@ -1,4 +1,4 @@
-package com.example.alexcalle.beaconbooking3;
+package com.example.alexcalle.beaconbooking3.models;
 
 /**
  * Created by hogst on 2016-11-29.

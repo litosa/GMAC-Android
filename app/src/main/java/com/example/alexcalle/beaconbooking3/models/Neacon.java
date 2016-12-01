@@ -1,4 +1,6 @@
-package com.example.alexcalle.beaconbooking3;
+package com.example.alexcalle.beaconbooking3.models;
+
+import com.example.alexcalle.beaconbooking3.estimotes.EstimoteType;
 
 /**
  * Created by hogst on 2016-11-29.

@@ -1,7 +1,7 @@
 <resources>
 
     <style name="Lock.Theme" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="Auth0.HeaderLogo">@drawable/wheel0</item>
+        <item name="Auth0.HeaderLogo">@drawable/gmaclogo</item>
         <item name="Auth0.HeaderTitle">@string/app_name</item>
         <item name="Auth0.HeaderTitleColor">#ffffff</item>
         <item name="Auth0.HeaderBackground">#526E83</item>

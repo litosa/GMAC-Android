@@ -1,6 +1,8 @@
-package com.example.alexcalle.beaconbooking3;
+package com.example.alexcalle.beaconbooking3.rest;
 
 import android.os.AsyncTask;
+
+import com.example.alexcalle.beaconbooking3.listeners.RestClientListener;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

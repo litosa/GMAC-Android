@@ -1,4 +1,4 @@
-package com.example.alexcalle.beaconbooking3;
+package com.example.alexcalle.beaconbooking3.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +10,11 @@ import android.widget.Toast;
 
 import com.estimote.sdk.BeaconManager;
 import com.estimote.sdk.SystemRequirementsChecker;
+import com.example.alexcalle.beaconbooking3.models.Employee;
+import com.example.alexcalle.beaconbooking3.R;
+import com.example.alexcalle.beaconbooking3.listeners.EmployeePutListener;
+import com.example.alexcalle.beaconbooking3.estimotes.ListenerManager;
+import com.example.alexcalle.beaconbooking3.services.EmployeeService;
 import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
 
 public class RegionActivity extends AppCompatActivity implements EmployeePutListener {
@@ -38,13 +43,6 @@ public class RegionActivity extends AppCompatActivity implements EmployeePutList
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        CredentialsManager.deleteCredentials(RegionActivity.this);
-        CredentialsManager.deleteUserId(RegionActivity.this);
-        CredentialsManager.deleteUserEmail(RegionActivity.this);
-
-        int duration = Toast.LENGTH_SHORT;
-        Toast toast = Toast.makeText(getApplicationContext(), "Du har loggat ut, Ha en fortsatt trevlig dag!", duration);
-        toast.show();
     }
 
     public void appInit(){
@@ -62,41 +60,30 @@ public class RegionActivity extends AppCompatActivity implements EmployeePutList
                 logout();
             }
         });
-
-//        ImageView img = (ImageView)findViewById(R.id.imageAnimation);
-//        img.setBackgroundResource(R.drawable.animation_list);//
-//        AnimationDrawable frameAnimation = (AnimationDrawable) img.getBackground();//
-//        frameAnimation.start();
-
     }
 
     private void logout()
     {
         _employeeService.updateUser(new Employee(CredentialsManager.getUserId(this), "0", "0"), this);
-        Intent intentLogout = new Intent(RegionActivity.this, LoginActivity.class);
-        startActivity(intentLogout);
-        finish();
-
     }
 
     @Override
     public void onEmployeePutSuccess() {
-//        CredentialsManager.deleteCredentials(RegionActivity.this);
-//        CredentialsManager.deleteUserId(RegionActivity.this);
-//        CredentialsManager.deleteUserEmail(RegionActivity.this);
-//
-////        Intent intentLogout = new Intent(RegionActivity.this, LoginActivity.class);
-////        startActivity(intentLogout);
-//
-//        int duration = Toast.LENGTH_SHORT;
-//        Toast toast = Toast.makeText(getApplicationContext(), "Du har loggat ut, Ha en fortsatt trevlig dag!", duration);
-//        toast.show();
-//
-//        finish();
+        CredentialsManager.deleteCredentials(RegionActivity.this);
+        CredentialsManager.deleteUserId(RegionActivity.this);
+        CredentialsManager.deleteUserEmail(RegionActivity.this);
+
+        Intent intentLogout = new Intent(RegionActivity.this, LoginActivity.class);
+        startActivity(intentLogout);
+
+        int duration = Toast.LENGTH_SHORT;
+        Toast toast = Toast.makeText(getApplicationContext(), "Du har loggat ut, Ha en fortsatt trevlig dag!", duration);
+        toast.show();
+
+        finish();
     }
 
     @Override
     public void onEmployeePutFailure() {
-
     }
 }

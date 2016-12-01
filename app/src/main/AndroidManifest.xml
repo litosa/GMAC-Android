@@ -28,17 +28,17 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".RegionActivity"
+            android:name=".activities.RegionActivity"
             android:allowBackup="true"
             android:screenOrientation="portrait" />
-        <activity android:name=".StartActivity">
+        <activity android:name=".activities.StartActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".LoginActivity" />
+        <activity android:name=".activities.LoginActivity" />
 
 
         <!-- Auth0 Lock -->

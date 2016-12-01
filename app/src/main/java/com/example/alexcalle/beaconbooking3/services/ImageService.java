@@ -1,5 +1,10 @@
-package com.example.alexcalle.beaconbooking3;
+package com.example.alexcalle.beaconbooking3.services;
 
+import com.example.alexcalle.beaconbooking3.models.ImageCollection;
+import com.example.alexcalle.beaconbooking3.rest.RestClient;
+import com.example.alexcalle.beaconbooking3.listeners.RestClientListener;
+import com.example.alexcalle.beaconbooking3.rest.RestClientResult;
+import com.example.alexcalle.beaconbooking3.listeners.ImageGetListener;
 import com.example.alexcalle.beaconbooking3.utils.CredentialsManager;
 import com.google.gson.Gson;
 

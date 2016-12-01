@@ -1,4 +1,4 @@
-package com.example.alexcalle.beaconbooking3;
+package com.example.alexcalle.beaconbooking3.rest;
 
 public class RestClientResult {
     public String method;

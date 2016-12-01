@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">BeaconBook</string>
+    <string name="app_name">Get Me A Colleague</string>
 
     <string name="auth0_preferences">AUTH0_SHARED_PREFERENCES_KEY</string>
     <string name="auth0_userProfile">"AUTH0_SHARED_USER_PROFILE"</string>
@@ -19,5 +19,6 @@
     <string name="login">Login</string>
 
     <string name="hint_first_name">Department</string>
+    <string name="hint_second_name">Developer</string>
 
 </resources>
